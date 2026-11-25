@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streamlit-rail-nav"
+version = "0.1.0"
+description = "Sidebar do Streamlit em formato trilho + painel (flyout), só com CSS."
+readme = "README.md"
+requires-python = ">=3.9"
+# O CSS depende do HTML interno do Streamlit: só libere versões testadas.
+dependencies = ["streamlit>=1.67,<1.68"]
+
+[tool.setuptools]
+packages = ["rail_nav"]
