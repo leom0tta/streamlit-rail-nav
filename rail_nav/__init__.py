@@ -30,7 +30,7 @@ import streamlit as st
 from ._css import montar_css
 
 __all__ = ["Tema", "rail_navigation", "aplicar_estilo"]
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 
 @dataclass(frozen=True)
@@ -49,6 +49,16 @@ class Tema:
     cor_hover_link: str = "#eef2f7"
     atraso_abrir_ms: int = 150        # espera antes de trocar de categoria
     atraso_fechar_ms: int = 350       # tolerância antes de fechar o painel
+
+    # Fonte e ícones
+    fonte: Optional[str] = None       # família do Google Fonts, ex.: "Inter", "Nunito Sans".
+                                      # None = fonte padrão do Streamlit (Source Sans)
+    peso_texto: int = 400             # nomes no trilho e links do painel (300 = mais leve)
+    peso_titulo: int = 600            # título do painel e página atual
+    icones_negrito: bool = False      # False = traço fino (300); True = grosso (600)
+    peso_icone: Optional[int] = None  # 100–700; se informado, ignora icones_negrito
+    estilo_icone: str = "outlined"    # "outlined", "rounded" ou "sharp"
+    carregar_google_fonts: bool = True  # False se o ambiente bloquear fonts.googleapis.com
 
     def com(self, **mudancas) -> "Tema":
         """Cópia do tema com alguns valores trocados."""

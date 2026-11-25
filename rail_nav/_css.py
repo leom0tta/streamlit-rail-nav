@@ -12,7 +12,73 @@ def montar_css(t: "Tema", titulos_secoes: list[str]) -> str:
         f'[data-testid="stNavSectionHeader"]::before {{ content: "{_escapar(s.upper())}"; }}\n'
         for i, s in enumerate(titulos_secoes, start=1)
     )
-    return _css_base(t).replace("</style>", titulos + "</style>")
+    importacoes, regras = _css_fontes(t)
+    css = _css_base(t).replace("<style>", "<style>\n" + importacoes, 1)
+    return css.replace("</style>", regras + titulos + "</style>")
+
+
+_ESTILOS_ICONE = {"outlined": "Outlined", "rounded": "Rounded", "sharp": "Sharp"}
+_NAV = '[data-testid="stSidebar"]'
+_ICONES = (
+    f'{_NAV} [data-testid="stIconMaterial"], '
+    f'{_NAV} [data-testid="stNavSectionHeader"] span[role="img"]'
+)
+_TEXTOS = (
+    f'{_NAV} [data-testid="stSidebarNav"] p, '
+    f'{_NAV} [data-testid="stSidebarNav"] [data-testid="stMarkdownContainer"], '
+    f'{_NAV} [data-testid="stNavSectionHeader"]::before, '
+    f'{_NAV} [data-testid="stSidebarUserContent"] button'
+)
+
+
+def _css_fontes(t: "Tema") -> tuple[str, str]:
+    """(@imports do Google Fonts, regras de fonte/ícone)."""
+    estilo = _ESTILOS_ICONE.get(t.estilo_icone.lower())
+    if estilo is None:
+        raise ValueError(
+            f"estilo_icone deve ser um de {sorted(_ESTILOS_ICONE)}; recebido {t.estilo_icone!r}"
+        )
+    peso_icone = t.peso_icone or (600 if t.icones_negrito else 300)
+    if not 100 <= peso_icone <= 700:
+        raise ValueError("peso_icone deve ficar entre 100 e 700")
+
+    importacoes = ""
+    if t.carregar_google_fonts:
+        familia_icone = f"Material+Symbols+{estilo}"
+        importacoes += (
+            f"@import url('https://fonts.googleapis.com/css2?family={familia_icone}"
+            ":opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block');\n"
+        )
+        if t.fonte:
+            pesos = ";".join(str(p) for p in sorted({t.peso_texto, t.peso_titulo}))
+            familia = t.fonte.strip().replace(" ", "+")
+            importacoes += (
+                f"@import url('https://fonts.googleapis.com/css2?family={familia}"
+                f":wght@{pesos}&display=swap');\n"
+            )
+
+    # Se o Google Fonts não carregar, cai na fonte de ícones do próprio Streamlit
+    familias = f'"Material Symbols {estilo}"'
+    if estilo != "Rounded":
+        familias += ', "Material Symbols Rounded"'
+    regras = f"""
+{_ICONES} {{
+  font-family: {familias} !important;
+  font-weight: {peso_icone} !important;
+  font-variation-settings: 'FILL' 0, 'wght' {peso_icone}, 'GRAD' 0, 'opsz' 24 !important;
+}}
+"""
+    if t.fonte:
+        fonte = t.fonte.replace('"', "")
+        regras += f"""
+{_TEXTOS} {{
+  font-family: "{fonte}", "Source Sans", sans-serif !important;
+}}
+"""
+    regras += f"""
+{_NAV} [data-testid="stSidebarNav"] p {{ font-weight: {t.peso_texto}; }}
+"""
+    return importacoes, regras
 
 
 def _escapar(texto: str) -> str:
@@ -91,7 +157,7 @@ section[data-testid="stSidebar"] > div,
 [data-testid="stNavSectionHeader"] p {{
   color: #d6e2ef !important;
   font-size: 11.5px !important;
-  font-weight: 500 !important;
+  font-weight: {t.peso_texto} !important;
   text-transform: none !important;
   letter-spacing: 0 !important;
   white-space: normal !important;
@@ -127,6 +193,20 @@ section[data-testid="stSidebar"] > div,
 }}
 [data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] p {{
   font-size: 11.5px !important; color: #d6e2ef !important;
+}}
+/* Centraliza o rótulo das páginas soltas (ex.: "Início"): o Streamlit alinha
+   o texto à esquerda dentro de uma caixa um pouco mais larga que ele */
+[data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] > span:last-child,
+[data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] [data-testid="stMarkdownContainer"],
+[data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] p {{
+  display: block !important;
+  width: 100%;
+  text-align: center !important;
+}}
+/* Ícone das páginas soltas no mesmo tamanho dos ícones das categorias */
+[data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] > span:first-child,
+[data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] > span:first-child span {{
+  width: auto !important; height: auto !important; font-size: 24px !important;
 }}
 [data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"]:hover,
 [data-testid="stSidebarNavItems"] > li a[aria-current="page"] {{
@@ -181,7 +261,7 @@ section[data-testid="stSidebar"] > div,
   top: calc(var(--painel-top) + 26px);
   left: calc(var(--rail-w) + 28px);
   z-index: 3;
-  font-size: 12.5px; font-weight: 700; letter-spacing: .12em;
+  font-size: 12.5px; font-weight: {t.peso_titulo}; letter-spacing: .12em;
   color: {t.cor_titulo_painel};
 }}
 
@@ -214,7 +294,7 @@ section[data-testid="stSidebar"] > div,
   background: {t.cor_hover_link} !important;
   box-shadow: inset 3px 0 0 {t.cor_trilho};
 }}
-[data-testid="stSidebarNavItems"] > div > li a[aria-current="page"] p {{ font-weight: 600 !important; }}
+[data-testid="stSidebarNavItems"] > div > li a[aria-current="page"] p {{ font-weight: {t.peso_titulo} !important; }}
 
 /* "Ver mais" do Streamlit (aparece com muitas páginas) – não faz sentido aqui */
 [data-testid="stSidebarNavViewButton"], [data-testid="stSidebarNavSeparator"] {{ display: none !important; }}

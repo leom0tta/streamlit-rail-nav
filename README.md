@@ -9,7 +9,7 @@ A navegação continua sendo a nativa do `st.navigation`. O pacote só organiza 
 No `requirements.txt` do app, travado numa versão:
 
 ```
-streamlit-rail-nav @ git+https://github.com/<seu-usuario>/streamlit-rail-nav@v0.1.0
+streamlit-rail-nav @ git+https://github.com/<seu-usuario>/streamlit-rail-nav@v0.1.2
 ```
 
 Ou localmente: `pip install -e .` na pasta deste repositório.
@@ -59,6 +59,27 @@ pagina = rail_navigation(secoes=..., tema=tema)
 | `cor_painel`, `cor_texto_painel`, `cor_titulo_painel`, `cor_hover_link` | tons claros | cores do painel |
 | `atraso_abrir_ms` | 150 | tempo parado numa categoria antes de trocar o painel |
 | `atraso_fechar_ms` | 350 | tolerância antes de fechar o painel quando o mouse sai |
+
+### Fonte e ícones
+
+```python
+Tema(fonte="Inter")                      # texto em Inter, ícones finos (padrão)
+Tema(fonte="Nunito Sans", peso_texto=300) # texto ainda mais leve
+Tema(icones_negrito=True)                # ícones grossos
+Tema(peso_icone=200, estilo_icone="rounded")
+```
+
+| Campo | Padrão | O que faz |
+|---|---|---|
+| `fonte` | `None` | família do [Google Fonts](https://fonts.google.com) (ex.: `"Inter"`). `None` mantém a fonte do Streamlit |
+| `peso_texto` | 400 | peso do texto do trilho e dos links (300 = mais leve) |
+| `peso_titulo` | 600 | título do painel e página atual |
+| `icones_negrito` | `False` | `False` = ícones finos (300), `True` = grossos (600) |
+| `peso_icone` | `None` | peso exato do ícone (100–700); se informado, ignora `icones_negrito` |
+| `estilo_icone` | `"outlined"` | `"outlined"`, `"rounded"` ou `"sharp"` |
+| `carregar_google_fonts` | `True` | `False` se a rede bloquear `fonts.googleapis.com` |
+
+A fonte e os ícones vêm do Google Fonts, carregados pelo navegador de quem acessa. Se a rede bloquear, o texto volta para a fonte do Streamlit e os ícones para a fonte de ícones do Streamlit (peso fixo, sem afinar). A fonte escolhida precisa ter os pesos pedidos em `peso_texto` e `peso_titulo`; senão o Google não devolve a fonte e vale o mesmo retorno.
 
 Para montar o `st.navigation` por conta própria, use só o CSS com `aplicar_estilo(["Comercial", "Receita"], tema)`, passando os títulos na mesma ordem das seções.
 
