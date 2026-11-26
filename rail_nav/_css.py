@@ -177,6 +177,9 @@ section[data-testid="stSidebar"] > div,
   text-transform: none !important;
   letter-spacing: 0 !important;
   white-space: normal !important;
+  word-break: keep-all !important;      /* nunca quebra no meio da palavra */
+  overflow-wrap: normal !important;
+  hyphens: none !important;
   line-height: 1.15 !important;
   display: flex; flex-direction: column; align-items: center; gap: 5px;
 }}
@@ -209,6 +212,7 @@ section[data-testid="stSidebar"] > div,
 }}
 [data-testid="stSidebarNavItems"] > li a[data-testid="stSidebarNavLink"] p {{
   font-size: 11.5px !important; color: #d6e2ef !important;
+  word-break: keep-all !important; overflow-wrap: normal !important;
 }}
 /* Centraliza o rótulo das páginas soltas (ex.: "Início"): o Streamlit alinha
    o texto à esquerda dentro de uma caixa um pouco mais larga que ele */

@@ -30,7 +30,7 @@ import streamlit as st
 from ._css import montar_css
 
 __all__ = ["Tema", "rail_navigation", "aplicar_estilo"]
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 
 @dataclass(frozen=True)
@@ -62,6 +62,12 @@ class Tema:
 
     # Visual
     estilo: str = "padrao"            # "padrao" ou "apple_tv" (vidro escuro, pílula no hover)
+
+    # Só para estilo="apple_tv"
+    cor_destaque: str = "#f5f5f7"     # pílula do item sob o mouse
+    cor_texto_destaque: Optional[str] = None  # texto sobre a pílula (None = cor_trilho)
+    vidro_opacidade: float = 0.55     # 0 = vidro transparente, 1 = sólido
+    vidro_desfoque: int = 32          # px de desfoque do que está atrás
 
     def com(self, **mudancas) -> "Tema":
         """Cópia do tema com alguns valores trocados."""

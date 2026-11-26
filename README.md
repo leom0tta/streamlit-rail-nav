@@ -9,7 +9,7 @@ A navegação continua sendo a nativa do `st.navigation`. O pacote só organiza 
 No `requirements.txt` do app, travado numa versão:
 
 ```
-streamlit-rail-nav @ git+https://github.com/<seu-usuario>/streamlit-rail-nav@v0.1.3
+streamlit-rail-nav @ git+https://github.com/<seu-usuario>/streamlit-rail-nav@v0.1.4
 ```
 
 Ou localmente: `pip install -e .` na pasta deste repositório.
@@ -66,13 +66,34 @@ pagina = rail_navigation(secoes=..., tema=tema)
 Tema(estilo="apple_tv")
 ```
 
-Visual inspirado no Apple TV, com a mesma estrutura de trilho + painel:
-- trilho e painel em **vidro escuro** (desfocam o conteúdo por trás, como o relatório);
+Visual em vidro escuro, com a mesma estrutura de trilho + painel:
+- trilho e painel em **vidro** (desfocam o conteúdo por trás), com reflexo suave no topo e filete de luz na borda;
 - o item sob o mouse vira uma **pílula clara que cresce**, com sombra;
-- painel **flutuante** com cantos arredondados, título grande e animação ao abrir;
+- painel **flutuante** com cantos arredondados, links em formato de pílula e animação ao abrir;
+- página atual marcada por uma placa de vidro mais clara;
 - fonte do sistema no Mac/iPhone (SF Pro) e Inter nos outros sistemas, se `fonte` não for informada.
 
-`cor_trilho` e `cor_trilho_ativo` continuam valendo (tom do vidro e da página atual). As cores do painel (`cor_painel`, `cor_texto_painel`, `cor_titulo_painel`, `cor_hover_link`) não se aplicam nesse estilo. O efeito de vidro precisa de um navegador atual; nos antigos, o painel fica escuro sólido.
+| Campo (só no `apple_tv`) | Padrão | O que faz |
+|---|---|---|
+| `cor_trilho` | `#16324f` | tom do vidro do trilho e do painel |
+| `cor_trilho_ativo` | `#24476b` | placa da página atual |
+| `cor_destaque` | `#f5f5f7` | pílula do item sob o mouse |
+| `cor_texto_destaque` | `None` | texto sobre a pílula (`None` = `cor_trilho`) |
+| `vidro_opacidade` | 0.55 | 0 = transparente, 1 = sólido |
+| `vidro_desfoque` | 32 | px de desfoque do que está atrás |
+
+As cores do painel do estilo padrão (`cor_painel`, `cor_texto_painel`, `cor_titulo_painel`, `cor_hover_link`) não se aplicam nesse estilo. O efeito de vidro precisa de um navegador atual; nos antigos, o painel fica escuro sólido.
+
+Exemplo para um app com fundo `#020e1e` e cards `#0d1828`:
+
+```python
+Tema(
+    estilo="apple_tv",
+    cor_trilho="#0d1828",
+    cor_trilho_ativo="#1e2837",
+    cor_texto_destaque="#020e1e",
+)
+```
 
 ### Fonte e ícones
 
