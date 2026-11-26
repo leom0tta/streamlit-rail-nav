@@ -15,6 +15,6 @@ pagina = rail_navigation(
             st.Page("pages/receita.py", title="Receita", icon=":material/calendar_month:"),
         ],
     },
-    tema=Tema(fonte="Inter"),  # ex.: Tema(fonte="Inter", icones_negrito=True, peso_texto=300)
+    tema=Tema(fonte="Inter"),  # ex.: Tema(estilo="apple_tv") ou Tema(fonte="Inter", icones_negrito=True)
 )
 pagina.run()

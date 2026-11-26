@@ -2,6 +2,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from ._apple_tv import css_apple_tv
+
 if TYPE_CHECKING:
     from . import Tema
 
@@ -9,12 +11,21 @@ if TYPE_CHECKING:
 def montar_css(t: "Tema", titulos_secoes: list[str]) -> str:
     titulos = "".join(
         f'[data-testid="stSidebarNavItems"] > div:nth-of-type({i}) > '
-        f'[data-testid="stNavSectionHeader"]::before {{ content: "{_escapar(s.upper())}"; }}\n'
+        f'[data-testid="stNavSectionHeader"]::before {{ content: "{_escapar(s)}"; }}\n'
         for i, s in enumerate(titulos_secoes, start=1)
     )
+    if t.estilo not in ESTILOS:
+        raise ValueError(f"estilo deve ser um de {list(ESTILOS)}; recebido {t.estilo!r}")
     importacoes, regras = _css_fontes(t)
     css = _css_base(t).replace("<style>", "<style>\n" + importacoes, 1)
-    return css.replace("</style>", regras + titulos + "</style>")
+    extra = css_apple_tv(t) if t.estilo == "apple_tv" else ""
+    return css.replace("</style>", extra + regras + titulos + "</style>")
+
+
+ESTILOS = ("padrao", "apple_tv")
+# Fonte padrão do apple_tv: a do sistema no Mac/iPhone (SF Pro) e Inter no resto
+_PILHA_APPLE = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif'
+
 
 
 _ESTILOS_ICONE = {"outlined": "Outlined", "rounded": "Rounded", "sharp": "Sharp"}
@@ -49,9 +60,10 @@ def _css_fontes(t: "Tema") -> tuple[str, str]:
             f"@import url('https://fonts.googleapis.com/css2?family={familia_icone}"
             ":opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block');\n"
         )
-        if t.fonte:
+        fonte_google = t.fonte or ("Inter" if t.estilo == "apple_tv" else None)
+        if fonte_google:
             pesos = ";".join(str(p) for p in sorted({t.peso_texto, t.peso_titulo}))
-            familia = t.fonte.strip().replace(" ", "+")
+            familia = fonte_google.strip().replace(" ", "+")
             importacoes += (
                 f"@import url('https://fonts.googleapis.com/css2?family={familia}"
                 f":wght@{pesos}&display=swap');\n"
@@ -68,11 +80,15 @@ def _css_fontes(t: "Tema") -> tuple[str, str]:
   font-variation-settings: 'FILL' 0, 'wght' {peso_icone}, 'GRAD' 0, 'opsz' 24 !important;
 }}
 """
+    pilha = None
     if t.fonte:
-        fonte = t.fonte.replace('"', "")
+        pilha = f'"{t.fonte.replace(chr(34), "")}", "Source Sans", sans-serif'
+    elif t.estilo == "apple_tv":
+        pilha = _PILHA_APPLE
+    if pilha:
         regras += f"""
 {_TEXTOS} {{
-  font-family: "{fonte}", "Source Sans", sans-serif !important;
+  font-family: {pilha} !important;
 }}
 """
     regras += f"""
@@ -262,6 +278,7 @@ section[data-testid="stSidebar"] > div,
   left: calc(var(--rail-w) + 28px);
   z-index: 3;
   font-size: 12.5px; font-weight: {t.peso_titulo}; letter-spacing: .12em;
+  text-transform: uppercase;
   color: {t.cor_titulo_painel};
 }}
 

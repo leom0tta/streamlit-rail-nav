@@ -9,7 +9,7 @@ A navegação continua sendo a nativa do `st.navigation`. O pacote só organiza 
 No `requirements.txt` do app, travado numa versão:
 
 ```
-streamlit-rail-nav @ git+https://github.com/<seu-usuario>/streamlit-rail-nav@v0.1.2
+streamlit-rail-nav @ git+https://github.com/<seu-usuario>/streamlit-rail-nav@v0.1.3
 ```
 
 Ou localmente: `pip install -e .` na pasta deste repositório.
@@ -59,6 +59,20 @@ pagina = rail_navigation(secoes=..., tema=tema)
 | `cor_painel`, `cor_texto_painel`, `cor_titulo_painel`, `cor_hover_link` | tons claros | cores do painel |
 | `atraso_abrir_ms` | 150 | tempo parado numa categoria antes de trocar o painel |
 | `atraso_fechar_ms` | 350 | tolerância antes de fechar o painel quando o mouse sai |
+
+### Estilo `apple_tv`
+
+```python
+Tema(estilo="apple_tv")
+```
+
+Visual inspirado no Apple TV, com a mesma estrutura de trilho + painel:
+- trilho e painel em **vidro escuro** (desfocam o conteúdo por trás, como o relatório);
+- o item sob o mouse vira uma **pílula clara que cresce**, com sombra;
+- painel **flutuante** com cantos arredondados, título grande e animação ao abrir;
+- fonte do sistema no Mac/iPhone (SF Pro) e Inter nos outros sistemas, se `fonte` não for informada.
+
+`cor_trilho` e `cor_trilho_ativo` continuam valendo (tom do vidro e da página atual). As cores do painel (`cor_painel`, `cor_texto_painel`, `cor_titulo_painel`, `cor_hover_link`) não se aplicam nesse estilo. O efeito de vidro precisa de um navegador atual; nos antigos, o painel fica escuro sólido.
 
 ### Fonte e ícones
 

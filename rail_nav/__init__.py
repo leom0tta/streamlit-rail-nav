@@ -30,7 +30,7 @@ import streamlit as st
 from ._css import montar_css
 
 __all__ = ["Tema", "rail_navigation", "aplicar_estilo"]
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 @dataclass(frozen=True)
@@ -59,6 +59,9 @@ class Tema:
     peso_icone: Optional[int] = None  # 100–700; se informado, ignora icones_negrito
     estilo_icone: str = "outlined"    # "outlined", "rounded" ou "sharp"
     carregar_google_fonts: bool = True  # False se o ambiente bloquear fonts.googleapis.com
+
+    # Visual
+    estilo: str = "padrao"            # "padrao" ou "apple_tv" (vidro escuro, pílula no hover)
 
     def com(self, **mudancas) -> "Tema":
         """Cópia do tema com alguns valores trocados."""
